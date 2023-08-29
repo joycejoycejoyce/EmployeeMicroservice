@@ -1,7 +1,9 @@
 package net.joyce.employeeservice;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class EmployeeServiceApplication {
@@ -10,4 +12,8 @@ public class EmployeeServiceApplication {
 		SpringApplication.run(EmployeeServiceApplication.class, args);
 	}
 
+	@Bean
+	public ModelMapper createModelMapper() {
+		return new ModelMapper();
+	}
 }
