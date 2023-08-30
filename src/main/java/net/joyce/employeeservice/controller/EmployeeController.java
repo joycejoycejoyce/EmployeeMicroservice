@@ -1,6 +1,7 @@
 package net.joyce.employeeservice.controller;
 
 import lombok.AllArgsConstructor;
+import net.joyce.employeeservice.dto.APIResponseDTO;
 import net.joyce.employeeservice.dto.EmployeeDTO;
 import net.joyce.employeeservice.service.EmployeeService;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,8 @@ public class EmployeeController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<EmployeeDTO> getEmployee(@PathVariable Long id) {
-        EmployeeDTO dto = employeeService.getEmployeeById(id);
+    public ResponseEntity<APIResponseDTO> getEmployee(@PathVariable Long id) {
+        APIResponseDTO dto = employeeService.getEmployeeById(id);
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
