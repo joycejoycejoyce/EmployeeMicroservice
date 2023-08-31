@@ -7,6 +7,7 @@ import net.joyce.employeeservice.dto.EmployeeDTO;
 import net.joyce.employeeservice.entity.Employee;
 import net.joyce.employeeservice.error.ResourceNotFoundException;
 import net.joyce.employeeservice.repository.EmployeeRepository;
+import net.joyce.employeeservice.service.APIClient;
 import net.joyce.employeeservice.service.EmployeeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
+
 
 import java.util.Optional;
 
@@ -25,8 +26,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeRepository employeeRepository;
     @Autowired
     ModelMapper modelMapper;
+    // open Feign, 用来 communicate between microservices 的
     @Autowired
-    private WebClient webClient;
+    private APIClient apiClient;
     @Override
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         // DTO -> Entity
@@ -58,12 +60,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private DepartmentDTO fetchDepartment(String departmentCode) {
-        // call 到这个给的 url, 然后返回一个 DepartmentDTO object
-        DepartmentDTO departmentDTO = webClient.get()
-                        .uri("http://localhost:8080/api/departments/" + departmentCode)
-                .retrieve()
-                .bodyToMono(DepartmentDTO.class)
-                .block();
+        // 去 call API 里面的方法
+        DepartmentDTO departmentDTO = apiClient.getDepartment(departmentCode);
         return departmentDTO;
     }
 }

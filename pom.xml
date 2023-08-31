@@ -48,10 +48,10 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-		<!-- use the Client Web dependency to communicate between microservices  -->
+		<!-- use the Open Feign dependency to communicate between microservices  -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
 		<!-- Added the Registry Client dependency -->
