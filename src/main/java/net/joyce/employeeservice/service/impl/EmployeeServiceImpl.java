@@ -1,5 +1,7 @@
 package net.joyce.employeeservice.service.impl;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import net.joyce.employeeservice.dto.APIResponseDTO;
 import net.joyce.employeeservice.dto.DepartmentDTO;
@@ -41,7 +43,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return result;
     }
-
+    /* 把 CircuitBreak name 和 Project name 设置成一样的
+    *
+    * */
+    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDTO getEmployeeById(Long employeeId) {
         Optional<Employee> byId = employeeRepository.findById(employeeId);
@@ -63,5 +68,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 去 call API 里面的方法
         DepartmentDTO departmentDTO = apiClient.getDepartment(departmentCode);
         return departmentDTO;
+    }
+
+    public APIResponseDTO getDefaultDepartment(Long employeeId, Exception exception) {
+        Optional<Employee> repo = employeeRepository.findById(employeeId);
+        if (repo.isEmpty()) {
+            throw new ResourceNotFoundException(employeeId);
+        }
+        Employee employee = repo.get();
+
+
+        EmployeeDTO employeeDTO = modelMapper.map(employee, EmployeeDTO.class);
+        DepartmentDTO departmentDTO = createDefaultDepartmentDTO();
+
+        APIResponseDTO apiResponseDTO = new APIResponseDTO();
+        apiResponseDTO.setEmployeeDTO(employeeDTO);
+        apiResponseDTO.setDepartmentDTO(departmentDTO);
+        return apiResponseDTO;
+    }
+
+    private DepartmentDTO createDefaultDepartmentDTO() {
+        DepartmentDTO dto = new DepartmentDTO();
+        dto.setDepartmentName("General Department");
+        dto.setDepartmentCode("GD001");
+        dto.setDepartmentDescription("General Department of the company");
+        return dto;
     }
 }
