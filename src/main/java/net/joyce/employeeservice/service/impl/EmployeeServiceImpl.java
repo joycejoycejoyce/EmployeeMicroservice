@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import net.joyce.employeeservice.dto.APIResponseDTO;
 import net.joyce.employeeservice.dto.DepartmentDTO;
 import net.joyce.employeeservice.dto.EmployeeDTO;
+import net.joyce.employeeservice.dto.OrganizationDto;
 import net.joyce.employeeservice.entity.Employee;
 import net.joyce.employeeservice.error.ResourceNotFoundException;
 import net.joyce.employeeservice.repository.EmployeeRepository;
 import net.joyce.employeeservice.service.APIClient;
 import net.joyce.employeeservice.service.EmployeeService;
+import net.joyce.employeeservice.service.OrganizationAPIClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     // open Feign, 用来 communicate between microservices 的
     @Autowired
     private APIClient apiClient;
+    @Autowired
+    private OrganizationAPIClient organizationAPIClient;
     @Override
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         // DTO -> Entity
@@ -61,13 +65,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         DepartmentDTO departmentDTO = fetchDepartment(employee.getDepartmentCode());
         // Entity -> DTO
         EmployeeDTO employeeDTO = modelMapper.map(employee, EmployeeDTO.class);
-        return new APIResponseDTO(employeeDTO, departmentDTO);
+
+        // get the organization info from Organization Microservice
+        OrganizationDto organizationDTO = fetchOrganization(employee.getOrganizationCode());
+
+        return new APIResponseDTO(employeeDTO, departmentDTO, organizationDTO);
     }
 
     private DepartmentDTO fetchDepartment(String departmentCode) {
         // 去 call API 里面的方法
         DepartmentDTO departmentDTO = apiClient.getDepartment(departmentCode);
         return departmentDTO;
+    }
+
+    private OrganizationDto fetchOrganization(String organizationCode) {
+        OrganizationDto organizationDto = organizationAPIClient.getOrganization(organizationCode);
+        return organizationDto;
     }
 
     public APIResponseDTO getDefaultDepartment(Long employeeId, Exception exception) {

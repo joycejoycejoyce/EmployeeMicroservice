@@ -1,6 +1,7 @@
 package net.joyce.employeeservice.service;
 
 import net.joyce.employeeservice.dto.DepartmentDTO;
+import net.joyce.employeeservice.dto.OrganizationDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
